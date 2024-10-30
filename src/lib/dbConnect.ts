@@ -1,31 +1,24 @@
-import mongoose, { ConnectOptions, Mongoose } from "mongoose";
+import knex, { Knex } from "knex";
+import config from "../../knexfile";
 
-const MONGODB_URI = process.env.MONGO_URI || "";
+let db: Knex | null = null;
 
-if (!MONGODB_URI) {
-  throw new Error(
-    "Please define the MONGODB URI (MONGO_URI) environment variable inside .env.local",
-  );
-}
-
-let cached: { conn: Mongoose | null; promise: Promise<Mongoose> | null } = {
-  conn: null,
-  promise: null,
-};
-
-async function dbConnect(): Promise<Mongoose> {
-  if (cached.conn) {
-    return cached.conn;
+async function dbConnect(): Promise<Knex> {
+  if (db) {
+    return db;
   }
 
-  if (!cached.promise) {
-    mongoose.set("strictQuery", true);
-    cached.promise = mongoose.connect(MONGODB_URI, {} as ConnectOptions).then((mongoose) => {
-      return mongoose;
-    });
+  db = knex(config.development);
+
+  try {
+    await db.raw("SELECT 1");
+    console.log("Connected to the database!");
+  } catch (error) {
+    console.error("Database connection failed:", error);
+    throw error;
   }
-  cached.conn = await cached.promise;
-  return cached.conn;
+
+  return db;
 }
 
 export default dbConnect;
