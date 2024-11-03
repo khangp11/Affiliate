@@ -36,9 +36,6 @@ const Login = () => {
     const settings = useSelector((state: any) => state.settings);
     const { t } = useTranslation();
 
-    console.log("Current Language:", t.toString());
-    console.log("Messages:", t);
-
     const errors: { [key: string]: string } = {
         Signin: "Try signing with a different account.",
         OAuthSignin: "Try signing with a different account.",
@@ -79,7 +76,6 @@ const Login = () => {
                 email: values.email,
                 password: values.password,
             });
-
             if (res?.error) {
                 const errorMessage = errors[res.error] ?? errors.default;
                 setError(errorMessage);
@@ -117,7 +113,7 @@ const Login = () => {
                                         <FormControl>
                                             <Input
                                                 type="email"
-                                                placeholder="Enter your email"
+                                                placeholder={t('enter_you_email') || ''}
                                                 {...field}
                                                 disabled={isPending}
                                             />
@@ -131,11 +127,11 @@ const Login = () => {
                                 name="password"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>Password</FormLabel>
+                                        <FormLabel>{t('password')}</FormLabel>
                                         <FormControl>
                                             <Input
                                                 type="password"
-                                                placeholder="Enter your password"
+                                                placeholder={t('enter_you_password') || ''}
                                                 {...field}
                                                 disabled={isPending}
                                             />

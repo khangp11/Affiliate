@@ -23,6 +23,7 @@ import { FaFacebook } from "react-icons/fa";
 import { useRouter } from "next/navigation";
 import { postData } from "@/lib/clientFunctions";
 import { useTranslation } from "react-i18next";
+import { sleep } from "@/lib/utils";
 
 const Register = () => {
     const [error, setError] = useState<string | undefined>("");
@@ -34,6 +35,7 @@ const Register = () => {
     const form = useForm<z.infer<typeof RegisterSchema>>({
         resolver: zodResolver(RegisterSchema),
         defaultValues: {
+            name: "",
             email: "",
             password: "",
             passwordConfirm: ""
@@ -43,27 +45,31 @@ const Register = () => {
     const onSubmit = async (values: z.infer<typeof RegisterSchema>) => {
         setError("");
         setSuccess("");
-        var password = values.password;
-        var confirmPassword = values.passwordConfirm;
-        if (password != confirmPassword) {
+        const { email, password, passwordConfirm } = values;
+        if (password !== passwordConfirm) {
             setError("Password does not match!");
             return;
         }
         try {
             const response = await postData('/api/auth/signup', {
-                username: values.email,
-                password: values.password,
+                name,
+                email,
+                password,
+                passwordConfirm
             });
             if (response.success) {
-                setSuccess('Đăng nhập thành công!');
+                setSuccess('Đăng ký thành công!');
+                await sleep(3000);
+                handleLogin();
             } else {
-                setError(response.err || 'Đăng nhập thất bại.');
+                setError(response.err || 'Đăng ký thất bại.');
             }
         } catch (err) {
+            console.error("Unexpected error:", err);
             setError("Đã xảy ra lỗi không mong muốn.");
         }
+    };
 
-    }
     const handleLogin = () => {
         router.push('/login');
     };
@@ -79,6 +85,24 @@ const Register = () => {
                         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
                             <FormField
                                 control={form.control}
+                                name="name"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Name</FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                type="text"
+                                                placeholder={t('enter_you_name') || ''}
+                                                {...field}
+                                                disabled={isPending}
+                                            />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
                                 name="email"
                                 render={({ field }) => (
                                     <FormItem>
@@ -86,7 +110,7 @@ const Register = () => {
                                         <FormControl>
                                             <Input
                                                 type="email"
-                                                placeholder="Enter your email"
+                                                placeholder={t('enter_you_email') || ''}
                                                 {...field}
                                                 disabled={isPending}
                                             />
@@ -104,7 +128,7 @@ const Register = () => {
                                         <FormControl>
                                             <Input
                                                 type="password"
-                                                placeholder="Enter your password"
+                                                placeholder={t('enter_you_password') || ''}
                                                 {...field}
                                                 disabled={isPending}
                                             />
@@ -122,7 +146,7 @@ const Register = () => {
                                         <FormControl>
                                             <Input
                                                 type="password"
-                                                placeholder="Enter your password"
+                                                placeholder={t('enter_you_confirm_password') || ''}
                                                 {...field}
                                                 disabled={isPending}
                                             />

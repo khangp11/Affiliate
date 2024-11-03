@@ -1,30 +1,29 @@
+import bcrypt from 'bcrypt';
+import UserModel from '@/models/UserModel';
 import { NextResponse } from 'next/server';
-import { z } from 'zod';
 
-const users: { email: string; password: string }[] = [];
+export async function POST(req: Request) {
+  console.log('POST /api/auth/signup');
+  try {
+    const { name, email, password, passwordConfirm } = await req.json();
+    if (password !== passwordConfirm) {
+      return NextResponse.json({ success: false, message: 'Passwords do not match.' }, { status: 400 });
+    }
 
-const RegisterSchema = z.object({
-  email: z.string().email({ message: 'Email is required' }),
-  password: z.string().min(6, { message: 'Minimum 6 characters required' }),
-});
+    const existingUser = await UserModel.findByEmail(email);
+    if (existingUser) {
+      return NextResponse.json({ success: false, message: 'Email already exists.' }, { status: 409 });
+    }
 
-export async function POST(request: Request) {
-  const body = await request.json();
+    const salt = await bcrypt.genSalt(6);
+    const hash = await bcrypt.hash(password, salt);
 
-  const result = RegisterSchema.safeParse(body);
-  console.log(result);
+    const userData = { name, email, hash, salt, isAdmin: false };
+    await UserModel.create(userData);
 
-  if (!result.success) {
-    return NextResponse.json(result.error.format(), { status: 400 });
+    return NextResponse.json({ success: true, message: 'User registered successfully!' }, { status: 201 });
+  } catch (err) {
+    console.error(err);
+    return NextResponse.json({ success: false, message: 'Internal server error.' }, { status: 500 });
   }
-
-  const { email, password } = result.data;
-
-  const existingUser = users.find(user => user.email === email);
-  if (existingUser) {
-    return NextResponse.json({ message: 'Email already in use' }, { status: 409 });
-  }
-
-  users.push({ email, password });
-  return NextResponse.json({ message: 'User registered successfully' }, { status: 201 });
 }

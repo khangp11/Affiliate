@@ -1,4 +1,14 @@
 {
   "login": "Login",
-  "register": "Register"
+  "register": "Register",
+  "email": "Email",
+  "password": "Password",
+  "confirmPassword": "Confirm Password",
+  "signIn": "Sign In",
+  "enter_you_password": "Enter your password",
+  "enter_you_email": "Enter your email",
+  "enter_you_confirm_password": "Enter your confirm password",
+  "registerNewAccount": "Register New Account",
+  "or": "or",
+  "enter_you_name": "Enter your name"
 }

@@ -13,19 +13,13 @@ export const fetchData = (url: string): Promise<any> =>
     });
 
 export async function postData(url: string, data: any): Promise<any> {
-  const response = await axios({
-    method: "post",
-    url,
-    data,
-  })
-    .then((res: AxiosResponse) => res.data)
-    .catch((error: Error) => {
-      console.log(error.message);
-      const errData = { success: false, err: error.message };
-      return errData;
-    });
-
-  return response;
+  try {
+    const response: AxiosResponse = await axios.post(url, data);
+    return response.data;
+  } catch (error: Error | any) {
+    console.error("Error in postData:", error.message);
+    return { success: false, err: error.message };
+  }
 }
 
 export async function updateData(url: string, data: any): Promise<any> {

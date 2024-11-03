@@ -1,5 +1,5 @@
 import NextAuth from "next-auth";
-import { User as DBUser } from "@/models/User";
+import { User as DBUser } from "@/types/User";
 
 declare module "next-auth" {
   interface User extends DBUser {

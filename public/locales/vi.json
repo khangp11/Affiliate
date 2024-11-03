@@ -1,4 +1,11 @@
 {
   "login": "Đăng nhập",
-  "register": "Đăng ký"
+  "register": "Đăng ký",
+  "email": "Email",
+  "password": "Mat khau",
+  "confirmPassword": "Xa nhap lai mat khau",
+  "signIn": "Dang nhap",
+  "enter_you_password": "nhap mat khau",
+  "registerNewAccount": "Dang ky tai khoan",
+  "or": "Hoan thanh"
 }

@@ -4,7 +4,8 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import FacebookProvider from "next-auth/providers/facebook";
 import GoogleProvider from "next-auth/providers/google";
 import dbConnect from "@/lib/dbConnect";
-import User from "@/models/User";
+import UserModel from "@/models/UserModel";
+import Email from "next-auth/providers/email";
 
 const options: NextAuthOptions = {
   providers: [
@@ -24,12 +25,12 @@ const options: NextAuthOptions = {
       },
       async authorize(credentials, req) {
         const { username, password } = credentials as { username: string; password: string };
+        console.log("credentials", credentials);
+        const userData: any = await UserModel.findByEmail(username);
+        console.log("userData", userData);
 
-        const knex = await dbConnect();
-
-        const userData = await knex('users').where({ email: username }).first();
         if (userData) {
-          const validPassword = await bcrypt.compare(password, userData.password);
+          const validPassword = await bcrypt.compare(password, userData.hash);
           if (validPassword) {
             return userData;
           }
@@ -62,7 +63,7 @@ const options: NextAuthOptions = {
       return token;
     },
     async session({ session, token }) {
-      session.user = token.user as User;
+      session.user = token.user as any;
       return session;
     },
     async redirect({ url, baseUrl }) {

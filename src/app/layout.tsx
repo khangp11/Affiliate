@@ -8,7 +8,7 @@ import { appWithI18Next } from "ni18n";
 import i18n from "../../next-i18next.config";
 import { I18nextProvider } from 'react-i18next';
 const inter = Inter({ subsets: ["latin"] });
-
+import "reflect-metadata";
 export default function RootLayout({
   children,
 }: Readonly<{
